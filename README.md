@@ -21,10 +21,10 @@ It « should be » compatible with **Greasemonkey** and **Violentmonkey**.
 ## Presentation
 
 ![](https://github.com/valsou/artePlusPlus/blob/master/img/french_sample.jpg)
-^ ^ ^ French translation ^ ^ ^
+^ ^ ^ German translation ^ ^ ^
 
 ![](https://github.com/valsou/artePlusPlus/blob/master/img/deutsch_sample.jpg)
-^ ^ ^ German translation ^ ^ ^
+^ ^ ^ French translation ^ ^ ^
 
 ![](https://github.com/valsou/artePlusPlus/blob/master/img/view_sample.jpg)
 
