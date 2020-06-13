@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         New Userscript
-// @namespace    http://tampermonkey.net/
+// @name         Arte++
 // @version      0.1
-// @description  try to take over the world!
-// @author       You
+// @description  Download videos of Arte.tv
+// @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
+// @author       Valentin MEZIN
 // @include      https://www.arte.tv/*
 // @run-at       document-body
 // @grant        GM_addStyle
