@@ -1,34 +1,66 @@
 // ==UserScript==
 // @name         Arte++
-// @version      0.1
+// @version      1.0
 // @description  Download videos of Arte.tv
 // @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
 // @author       Valentin MEZIN
 // @include      https://www.arte.tv/*
 // @run-at       document-body
 // @grant        GM_addStyle
+// @grant        GM_setClipboard
 // @noframes
 // ==/UserScript==
-
-// TODO :
-// BUG QUAND ON RESIZE LA FENETRE !!!!!
 
 'use strict';
 
 GM_addStyle(`
-.arte-plus-plus ul {
-display: flex;
-margin-left: 0;
-list-style-type: none;
+.arte-plus-plus .row {
+margin-bottom: 1.25rem;
 }
 
-.arte-plus-plus li {
-background-color: black;
+.arte-plus-plus a {
+color: #9f9f9f;
+border-top: 0.05rem solid #535353;
+border-bottom: 0.05rem solid #535353;
+border-left: 0.05rem solid #535353;
 }
 
-.arte-plus-plus li a {
+.arte-plus-plus .row a,
+.arte-plus-plus .row span {
+font-size: 1.1rem;
+padding: .3rem;
 display: inline-block;
-color: white;
+}
+
+.arte-plus-plus .copypaste {
+background-color: #535353;
+color: #2F2F2F;
+border-top: 0.05rem solid #535353;
+border-bottom: 0.05rem solid #535353;
+border-left: 0.05rem solid #535353;
+cursor: pointer;
+}
+
+.link-plus-plus {
+display: inline-block;
+}
+
+.link-plus-plus .copypaste:hover,
+.link-plus-plus .copypaste.copied {
+background-color: white;
+color: #2F2F2F;
+border-color: white;
+}
+
+.link-plus-plus a:hover {
+background-color: white;
+color: #2F2F2F;
+border-color: white;
+}
+
+.link-plus-plus a:hover .copypaste {
+background-color: transparent;
+color: #9f9f9f;
 }`);
 
 const ARTE_API = 'https://api.arte.tv/api/player/v1/config/';
@@ -42,49 +74,58 @@ const LOCALE = {
         'en_EN': 'Downloads',
         'es_ES': 'Descargas',
         'pl_PL': 'Pliki do pobrania',
-        'it_IT': 'Download'}
+        'it_IT': 'Download'},
+    'copy': {
+        'fr_FR': 'Copier',
+        'de_DE': 'Kopieren',
+        'en_EN': 'Copy',
+        'es_ES': 'Copiar',
+        'pl_PL': 'Kopiuj',
+        'it_IT': 'Copia'},
+    'copied': {
+        'fr_FR': 'Copié !',
+        'de_DE': 'Kopiert !',
+        'en_EN': 'Copied !',
+        'es_ES': 'Copiado !',
+        'pl_PL': 'Skopiowane !',
+        'it_IT': 'Copiato !'}
 };
+
 let last_page_viewed = "";
-// const CODES = {
-//     'fr': {
-//         'VF': 'Français (Doublé)',
-//         'VOF': 'Français (Original)',
-//         'VOA-STF': 'Allemand (sous-titré)',
-//         'VOA-STMF': 'Allemand (sourds et malentendants)',
-//         'VOF-STMA': 'Français (sourds et malentendants)'
-//     },
-//     'de': {
-//         'VA': 'Deutsch (Synchronisiert)',
-//         'VOA': 'Deutsch (Original)',
-//         'VOA-STA': '',
-//         'VOA-STMA': 'Deutsch (Hörgeschädigte)',
-//         'VOF-STMA': 'Französisch (Hörgeschädigte)'
-//     }
-// };
 
 console.log("Arte++ is running...");
 
 (function() {
     console.log("Observing...");
+
     let nodeElement = ELEMENT_TO_OBSERVE;
     let config = { attributes: true, subtree: true };
+
     let callback = function(mutationsList) {
+
         for(var mutation of mutationsList) {
+
             if (mutation.target.className == 'video-thumbnail') {
+
                 if (last_page_viewed != mutation.target.baseURI) {
+
                     console.log("Page changed : "+ window.location.pathname);
+
                     if (mutation.target.baseURI.match(REGEX)) {
-                    last_page_viewed = mutation.target.baseURI;
-                    getJSON();
+                        last_page_viewed = mutation.target.baseURI;
+                        getJSON();
+                    }
+
                 }
+
             }
 
         }
-    }
 
     };
- let observer = new MutationObserver(callback);
-observer.observe(nodeElement, config);
+
+    let observer = new MutationObserver(callback);
+    observer.observe(nodeElement, config);
 })();
 
 function getJSON() {
@@ -140,52 +181,63 @@ function getLinks(json) {
 }
 
 function showLinks(data) {
-    let versions = data.videos.sort(sortingByLang);
 
+    let versions = data.videos.sort(sortingByLang);
     let parent = document.querySelector(PARENT_TO_APPEND).parentElement;
     let content = document.createElement("section");
+    let ul = document.createElement("div");
+    let old_label = "";
+
     parent.after(content);
 
     content.insertAdjacentHTML('beforeend', '<h1><span class="program-title">'+LOCALE.downloads[data.isoLang]+'</span></h1>');
-
     content.classList.add("program-section", "margin-bottom-s", "arte-plus-plus");
-
-    let old_label = "";
-
-    let ul = document.createElement("ul");
     ul.classList.add("row");
 
     versions.forEach( function(element) {
 
-        // Subtitle
         let label = element.title;
 
         if (label != old_label || old_label == "") {
+
             if (label != old_label && old_label != "") {
                 content.appendChild(ul);
-                ul = document.createElement("ul");
+                ul = document.createElement("div");
                 ul.classList.add("row");
             }
 
             let subtitle = document.createElement("h2");
+
             content.appendChild(subtitle);
             subtitle.insertAdjacentHTML('beforeend', '<span class="program-title small">'+label+'</span>');
 
-
-
             old_label = label;
-
-
         }
 
-
-        ul.insertAdjacentHTML('beforeend', '<li class="columns"><a title="'+element.title+'" href="'+element.url+'">.'+element.extension.toUpperCase()+' ('+element.width+'x'+element.height+')<br />Bitrate : '+element.bitrate+' kbps</a></li>');
-
+        ul.insertAdjacentHTML('beforeend', '<div class="columns small-12 medium-6 large-3 "><div class="link-plus-plus"><a class="copied" target="_blank" title="'+element.title+'" href="'+element.url+'">'+element.extension.toUpperCase()+' ('+element.width+'x'+element.height+')</a><span class="copypaste">&#x2398 '+LOCALE.copy[data.isoLang]+'</span></div></div>');
 
     });
 
     content.appendChild(ul);
 
+    let copypaste = document.querySelectorAll('.copypaste');
+
+    Array.from(copypaste).forEach(link => {
+
+        link.addEventListener('click', function(event) {
+
+            link.innerHTML = LOCALE.copied[data.isoLang];
+            link.classList.add("copied");
+
+            setTimeout(function(timer){
+                link.innerHTML = '&#x2398 '+LOCALE.copy[data.isoLang];
+                link.classList.remove("copied");
+            }, 3000);
+
+            GM_setClipboard(link.previousSibling.href, "text")
+
+        });
+    });
 }
 
 function sortingByLang (a, b) {
@@ -195,86 +247,3 @@ function sortingByLang (a, b) {
     return a.code > b.code ? 1 : -1;
 }
 
-
-//         const API_JSON_URL = API_BASE + VIDEO_ID;
-//         let onJsonLoadedCb = function(data) {
-//                 let allVideoData = data.videoJsonPlayer.VSR;
-//                 let keys = Object.keys(allVideoData);
-//                 let customDataArray = [];
-//                 let content = document.createElement("div");
-//                 content.className = "arte-tv-video-downloader";
-//                 let header = document.createElement("h2");
-//                 let downloadStyle = document.createElement("style");
-//                 const targetEl = document.querySelector(".metas-infos");
-//                 header.innerHTML = "Download";
-//                 downloadStyle.innerHTML = `
-// .arte-tv-video-downloader {
-// color: #fff;
-// overflow: auto;
-// }
-// .arte-tv-video-downloader ul {
-// list-style: none;
-// display: block;
-// max-width: 100%;
-// }
-// .arte-tv-video-downloader li {
-// display: inline-block;
-// padding: 5px;
-// border: 1px solid;
-// margin: 5px;
-// border-radius: 3px;
-// }
-// .arte-tv-video-downloader a {
-// color: #fff;
-// text-decoration: none;
-// white-space: nowrap;
-// }
-// .arte-tv-video-downloader a:hover {
-// color: #a9dc76;
-// text-decoration: none;
-// white-space: nowrap;
-// }
-// .arte-tv-video-downloader li:hover {
-// background-color: #000;
-// border-color: #a9dc76;
-// }
-// `;
-//                 let list = document.createElement("ul");
-//                 keys.forEach((key) => {
-//                         let videoData = allVideoData[key];
-//                         if (videoData.mimeType.startsWith("video") === false) {
-//                                 return;
-//                         }
-//                         let customData = {
-//                                 title: videoData.versionLibelle,
-//                                 url: videoData.url,
-//                                 width: videoData.width,
-//                                 height: videoData.height,
-//                                 bitrate: videoData.bitrate
-//                         };
-//                         customDataArray.push(customData);
-//                 });
-//                 customDataArray.forEach((v) => {
-//                         let el = document.createElement("li");
-//                         let anchor = document.createElement("a");
-//                         let dim = v.width + "x" + v.height;
-//                         anchor.innerHTML = v.title + " (" + dim + ")";
-//                         anchor.href = v.url;
-//                         anchor.download = true;
-//                         anchor.target = "_blank";
-//                         el.appendChild(anchor);
-//                         list.appendChild(el);
-//                 });
-//                 content.appendChild(header);
-//                 content.appendChild(list);
-//                 setTimeout(() => {
-//                         targetEl.parentNode.appendChild(downloadStyle);
-//                         targetEl.appendChild(content);
-//                 }, 3500);
-//         };
-//         LOG()("Fetching available Videos via API");
-//         window.fetch(API_JSON_URL).then((resp) => resp.json())
-//                 .catch((ex1) => {LOG("error")("Could not fetch available Videos via API");})
-//                 .then(onJsonLoadedCb)
-//                 .catch((ex)=>{LOG("error")("Could not parse available Videos");});
-// };
