@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Arte++
-// @version      1.0
+// @version      1.1
 // @description  Download videos of Arte.tv
 // @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
 // @author       Valentin MEZIN
@@ -20,9 +20,7 @@ margin-bottom: 1.25rem;
 
 .arte-plus-plus a {
 color: #9f9f9f;
-border-top: 0.05rem solid #535353;
-border-bottom: 0.05rem solid #535353;
-border-left: 0.05rem solid #535353;
+border: 0.05rem solid #535353;
 }
 
 .arte-plus-plus .row a,
@@ -35,10 +33,12 @@ display: inline-block;
 .arte-plus-plus .copypaste {
 background-color: #535353;
 color: #2F2F2F;
-border-top: 0.05rem solid #535353;
-border-bottom: 0.05rem solid #535353;
-border-left: 0.05rem solid #535353;
+border: 0.05rem solid #535353;
 cursor: pointer;
+}
+
+.arte-plus-plus .columns {
+margin-bottom : 0.5rem;
 }
 
 .link-plus-plus {
@@ -90,6 +90,7 @@ const LOCALE = {
         'pl_PL': 'Skopiowane !',
         'it_IT': 'Copiato !'}
 };
+const ICON_COPY = '&#x2398';
 
 let last_page_viewed = "";
 
@@ -151,7 +152,7 @@ function getLinks(json) {
     let parsed_data = [];
     let array_to_return = [];
 
-    video_keys.forEach((key) => {
+    Array.from(video_keys).forEach((key) => {
         let data = video_data[key];
 
         if (data.mimeType.startsWith("video") === false) {
@@ -214,25 +215,30 @@ function showLinks(data) {
             old_label = label;
         }
 
-        ul.insertAdjacentHTML('beforeend', '<div class="columns small-12 medium-6 large-3 "><div class="link-plus-plus"><a class="copied" target="_blank" title="'+element.title+'" href="'+element.url+'">'+element.extension.toUpperCase()+' ('+element.width+'x'+element.height+')</a><span class="copypaste">&#x2398 '+LOCALE.copy[data.isoLang]+'</span></div></div>');
+        ul.insertAdjacentHTML('beforeend', '<div class="columns small-12 medium-6 large-3 "><div class="link-plus-plus"><a class="copied" target="_blank" title="'+element.title+'" href="'+element.url+'">'+element.extension.toUpperCase()+' ('+element.width+'x'+element.height+')</a><span class="copypaste">'+ICON_COPY+' '+LOCALE.copy[data.isoLang]+'</span></div></div>');
 
     });
 
     content.appendChild(ul);
 
     let copypaste = document.querySelectorAll('.copypaste');
+    let last_copied = [];
 
     Array.from(copypaste).forEach(link => {
 
         link.addEventListener('click', function(event) {
+            console.log(last_copied);
 
-            link.innerHTML = LOCALE.copied[data.isoLang];
-            link.classList.add("copied");
+            if (last_copied[0] != undefined) {
+                clearTimeout(last_copied[0]);
+                copied(last_copied[1], ICON_COPY+' '+LOCALE.copy[data.isoLang], false);
+            }
 
-            setTimeout(function(timer){
-                link.innerHTML = '&#x2398 '+LOCALE.copy[data.isoLang];
-                link.classList.remove("copied");
-            }, 3000);
+            copied(link, ICON_COPY+' '+LOCALE.copied[data.isoLang], true);
+
+            last_copied = [setTimeout(function(timer){
+                copied(link, ICON_COPY+' '+LOCALE.copy[data.isoLang], false);
+            }, 400), link];
 
             GM_setClipboard(link.previousSibling.href, "text")
 
@@ -247,3 +253,12 @@ function sortingByLang (a, b) {
     return a.code > b.code ? 1 : -1;
 }
 
+function copied(element, message, bool) {
+    if (bool) {
+        element.innerHTML = message;
+        element.classList.add("copied");
+    } else {
+        element.innerHTML = message;
+        element.classList.remove("copied");
+    }
+}
