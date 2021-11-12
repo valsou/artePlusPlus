@@ -4,7 +4,7 @@
 // @description  Download videos of Arte.tv
 // @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
 // @author       Valentin MEZIN
-// @include      https://www.arte.tv/*
+// @include      /https:\/\/www.arte.tv\/(fr|de|en|es|pl|it)\/videos\/\d{6}-\d{3}-[A-Z]\//
 // @run-at       document-body
 // @grant        GM_addStyle
 // @grant        GM_setClipboard
