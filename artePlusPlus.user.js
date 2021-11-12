@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Arte++
-// @version      1.1
+// @version      1.2
 // @description  Download videos of Arte.tv
 // @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
 // @author       Valentin MEZIN
@@ -14,6 +14,25 @@
 'use strict';
 
 GM_addStyle(`
+.arte-plus-plus {
+padding-top: 60px;
+}
+
+.arte-plus-plus h1, h2 {
+font-family: "barna",sans-serif;
+}
+
+.arte-plus-plus h1 {
+font-size: 1.6rem;
+font-weight: 700;
+color: white;
+}
+
+.arte-plus-plus h2 {
+font-size: 1.4rem;
+color: white;
+}
+
 .arte-plus-plus .row {
 margin-bottom: 1.25rem;
 }
@@ -66,7 +85,7 @@ color: #9f9f9f;
 const ARTE_API = 'https://api.arte.tv/api/player/v1/config/';
 const REGEX = /https:\/\/www.arte.tv\/(fr|de|en|es|pl|it)\/videos\/\d{6}-\d{3}-[A-Z]\//;
 const ELEMENT_TO_OBSERVE = document.querySelector('body');
-const PARENT_TO_APPEND = '.metas-infos';
+const PARENT_TO_APPEND = '#__next .container main h1';
 const LOCALE = {
     'downloads': {
         'fr_FR': 'Téléchargements',
@@ -99,34 +118,37 @@ console.log("Arte++ is running...");
 (function() {
     console.log("Observing...");
 
-    let nodeElement = ELEMENT_TO_OBSERVE;
-    let config = { attributes: true, subtree: true };
+    getJSON();
 
-    let callback = function(mutationsList) {
+//     let nodeElement = ELEMENT_TO_OBSERVE;
+//     let config = { attributes: true, subtree: true };
 
-        for(var mutation of mutationsList) {
+//     let callback = function(mutationsList) {
 
-            if (mutation.target.className == 'video-thumbnail') {
+//         for(var mutation of mutationsList) {
 
-                if (last_page_viewed != mutation.target.baseURI) {
+//             if (mutation.target.className == 'video-thumbnail') {
 
-                    console.log("Page changed : "+ window.location.pathname);
+//                 if (last_page_viewed != mutation.target.baseURI) {
 
-                    if (mutation.target.baseURI.match(REGEX)) {
-                        last_page_viewed = mutation.target.baseURI;
-                        getJSON();
-                    }
+//                     console.log("Page changed : "+ window.location.pathname);
 
-                }
+//                     if (mutation.target.baseURI.match(REGEX)) {
+//                         console.log("OK");
+//                         last_page_viewed = mutation.target.baseURI;
+//                         getJSON();
+//                     }
 
-            }
+//                 }
 
-        }
+//             }
 
-    };
+//         }
 
-    let observer = new MutationObserver(callback);
-    observer.observe(nodeElement, config);
+//     };
+
+//     let observer = new MutationObserver(callback);
+//     observer.observe(nodeElement, config);
 })();
 
 function getJSON() {
@@ -185,14 +207,14 @@ function showLinks(data) {
 
     let versions = data.videos.sort(sortingByLang);
     let parent = document.querySelector(PARENT_TO_APPEND).parentElement;
-    let content = document.createElement("section");
+    let content = document.createElement("div");
     let ul = document.createElement("div");
     let old_label = "";
 
     parent.after(content);
 
-    content.insertAdjacentHTML('beforeend', '<h1><span class="program-title">'+LOCALE.downloads[data.isoLang]+'</span></h1>');
-    content.classList.add("program-section", "margin-bottom-s", "arte-plus-plus");
+    content.insertAdjacentHTML('beforeend', '<h1>'+LOCALE.downloads[data.isoLang]+'</h1>');
+    content.classList.add("arte-plus-plus");
     ul.classList.add("row");
 
     versions.forEach( function(element) {
@@ -210,7 +232,7 @@ function showLinks(data) {
             let subtitle = document.createElement("h2");
 
             content.appendChild(subtitle);
-            subtitle.insertAdjacentHTML('beforeend', '<span class="program-title small">'+label+'</span>');
+            subtitle.insertAdjacentHTML('beforeend', label);
 
             old_label = label;
         }
