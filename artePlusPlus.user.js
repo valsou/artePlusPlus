@@ -130,7 +130,7 @@ function showLinks(data) {
     ELEMENT_TO_OBSERVE.insertAdjacentHTML('afterend', '<div id="arteplusplus"></div>');
     let div = document.querySelector("#arteplusplus");
     div.setAttribute('class',div.previousSibling.getAttribute('class'));
-    div.innerHTML = "<p><b>Copy and paste one of the links below with youtube-dl software.</b>It will download the stream of the audio & the video, then merge both into a .mp4 file. You'll also need ffmpeg to do the merging.<br><br>";
+    div.innerHTML = "<p><b>Copy and paste one of the links below with youtube-dl software.</b>It will download the stream of the audio & the video, then merge both into a .mp4 file. You'll also need ffmpeg to do the merging.<br>";
     div.innerHTML += "Youtube-dl downlopad page: <a href=\"https://github.com/ytdl-org/youtube-dl\">https://github.com/ytdl-org/youtube-dl</a><br>FFmpeg download page: <a href=\"https://ffmpeg.org/download.html\">https://ffmpeg.org/download.html</a><br><br>";
     div.innerHTML += "arte.tv doesn't provide anymore link to a .mp4 file. :)<br><br>";
 
