@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Arte++
-// @version      1.2.1
+// @version      1.2.2
 // @description  Download videos of Arte.tv
 // @downloadURL  https://raw.githubusercontent.com/valsou/artePlusPlus/master/artePlusPlus.user.js
 // @updateURL    https://raw.githubusercontent.com/valsou/artePlusPlus/master/artePlusPlus.user.js
