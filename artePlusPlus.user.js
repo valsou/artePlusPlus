@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Arte++
-// @version      1.2
+// @version      1.2.1
 // @description  Download videos of Arte.tv
-// @downloadURL  https://github.com/valsou/artePlusPlus/blob/master/artePlusPlus.js
+// @downloadURL  https://raw.githubusercontent.com/valsou/artePlusPlus/master/artePlusPlus.user.js
+// @updateURL    https://raw.githubusercontent.com/valsou/artePlusPlus/master/artePlusPlus.user.js
 // @author       Valentin MEZIN
-// @include      /https:\/\/www.arte.tv\/(fr|de|en|es|pl|it)\/videos\/\d{6}-\d{3}-[A-Z]\//
+// @match        https://www.arte.tv/*/videos/*
 // @run-at       document-body
 // @grant        GM_addStyle
 // @grant        GM_setClipboard
