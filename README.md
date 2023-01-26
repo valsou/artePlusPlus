@@ -1,5 +1,9 @@
 ![](https://github.com/valsou/artePlusPlus/blob/master/img/arteplusplus.png)
 
+## January 2023 (Repo archived)
+In the light of the impossibility to retrieve a muxed .mp4, the userscript is no more useful.
+Alternative is to paste the url of the page to **yt-dlp**.
+
 ## Description
 My wife needed to download more easily a bunch of videos from ARTE.tv for her students.
 
